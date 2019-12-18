@@ -14,14 +14,15 @@ pd.set_option('display.max_columns', 50)
 # Pandas provide you with the functionality to directly pull data into your 
 # local python environment from web urls
 df = pd.read_csv('https://raw.githubusercontent.com/resbaz/r-novice-gapminder-files/master/data/gapminder-FiveYearData.csv')
-print('Dataframe:', df)
+print('Dataframe:')
+display(df.head())
 
 # Creating the pivot table
 # X-axis: year
 # Y-axis: country
 # Values: Life expectancy(lifExp)
 df_pivot = pd.pivot_table(df, values='lifeExp', index='country', columns='year')
-df_pivot.head()
+display(df_pivot.head())
 
 # Plotting the heatmap
 plt.figure(figsize=(20, 10))
