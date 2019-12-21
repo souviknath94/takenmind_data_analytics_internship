@@ -13,7 +13,7 @@ from sklearn.preprocessing import LabelEncoder, StandardScaler
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.model_selection import train_test_split, cross_validate
 from sklearn.model_selection import RandomizedSearchCV, GridSearchCV
-from sklearn.metrics import classification_report
+from sklearn.metrics import accuracy_score, classification_report
 from sklearn.pipeline import Pipeline
 warnings.filterwarnings("ignore")
 
@@ -56,7 +56,7 @@ print(Scores['test_f1_macro'])
 # Random Search
 # Defining the distribution to perform hyperparameter tuning through random search
 Distribution = {
-    'classifier__max_depth': sp_randInt(5, 10),
+    'classifier__max_depth': sp_randInt(1, 10),
     'classifier__max_features': sp_randInt(1, 4),
     'classifier__criterion': ['gini', 'entropy'],
     'classifier__min_samples_split': sp_randInt(5, 10),
@@ -73,6 +73,10 @@ param_grid = {
                   [RandmSearch.best_params_['classifier__max_depth']-1,
                    RandmSearch.best_params_['classifier__max_depth'],
                    RandmSearch.best_params_['classifier__max_depth']+1],
+              'classifier__max_features':
+                  [RandmSearch.best_params_['classifier__max_features'],
+                   RandmSearch.best_params_['classifier__max_features']+1,
+                   RandmSearch.best_params_['classifier__max_features']+2],
               'classifier__min_samples_leaf':
                   [RandmSearch.best_params_['classifier__min_samples_leaf']-1,
                    RandmSearch.best_params_['classifier__min_samples_leaf'],
@@ -88,7 +92,11 @@ GridClf = CVGrid.fit(XTrain, YTrain)
 
 TestData = XTest.copy()
 TestData['y_actual'] = YTest
-TestData['pred'] = GridClf.predict(XTest)
+TestData['pred'] = GridClf.best_estimator_.predict(XTest)
+
+# Calculating accuracy
+print('Accuracy:')
+print(accuracy_score(TestData['y_actual'], TestData['pred']))
 
 # Generating the report for the model diagnostics
 Report = pd.DataFrame(classification_report(TestData['y_actual'],
